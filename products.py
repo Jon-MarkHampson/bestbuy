@@ -20,7 +20,10 @@ class Product:
         return float(self.quantity)
 
     def set_quantity(self, quantity: int):
-        """Sets the product's quantity. Deactivates the product if quantity reaches 0."""
+        """
+        Sets the product's quantity.
+        Deactivates the product if quantity reaches 0.
+        """
         if quantity < 0:
             raise ValueError("The quantity must be non-negative.")
 
@@ -42,24 +45,22 @@ class Product:
         self.active = False
 
     def show(self) -> str:
-        """Prints a string representation of the product."""
-        return (
-            f"Product: {self.name}, Price: {self.price:.2f}, "
-            f"Quantity: {self.quantity}, Active: {self.active}"
-        )
+        """Returns a string representation of the product."""
+        return f"Product: {self.name}, Price: ${self.price:.2f}, Quantity: {self.quantity}, Active: {self.active}"
 
     def buy(self, quantity: int) -> float:
-        """Buys a given quantity of the product and returns the total price."""
+        """
+        Buys a given quantity of the product and returns the total price.
+        Raises an exception if the product is inactive, the quantity is <= 0,
+        or there is insufficient stock.
+        """
         if not self.active:
             raise Exception("Cannot buy this product because it is inactive.")
         if quantity <= 0:
             raise ValueError("The quantity to buy must be greater than 0.")
         if quantity > self.quantity:
-            raise Exception(
-                f"Insufficient stock to complete the purchase. Available quantity: {self.quantity}."
-            )
+            raise Exception(f"Insufficient stock to complete the purchase. Available: {self.quantity}")
 
         total_price = self.price * quantity
-        self.set_quantity(self.quantity - quantity)
-
+        self.set_quantity(self.quantity - quantity)  # Updates quantity & deactivates if it hits 0
         return total_price

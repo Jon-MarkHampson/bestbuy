@@ -1,29 +1,41 @@
 class Store:
-    """This Store class will contain all the instances of the Products class"""
+    """This Store class will contain all the instances of the Product class."""
 
     def __init__(self, products_list):
+        """
+        Initialize the store with a list of products.
+        :param products_list: list of Product instances
+        """
         self.products_list = products_list
 
     def add_product(self, product):
+        """Adds a new product to the store."""
         self.products_list.append(product)
 
     def remove_product(self, product):
+        """Removes a product from the store."""
         self.products_list.remove(product)
 
     def get_total_quantity(self) -> int:
-        # total_products = 0
-        # for product in self.products_list:
-        #     total_products += product.quantity
-        # return total_products
+        """
+        Gets the total quantity of all products in the store (sum of all product quantities).
+        """
         return sum(product.quantity for product in self.products_list)
 
     def get_all_products(self) -> list:
-        return [product for product in self.products_list if product.active]
+        """
+        Returns a list of all active products in the store.
+        A product is considered active if product.active == True.
+        """
+        return [product for product in self.products_list if product.is_active()]
 
     def order(self, shopping_list) -> float:
-        # total_price = 0
-        # for Product, quantity in shopping_list:
-        #     total_price += Product.price * quantity
-        # return total_price
-        return sum(Product.price * quantity for Product, quantity in shopping_list)
-
+        """
+        Takes a list of (Product, quantity) tuples and processes the purchase,
+        returning the total price. Will raise exceptions if insufficient stock
+        or the product is inactive.
+        """
+        total_price = 0
+        for product, quantity in shopping_list:
+            total_price += product.buy(quantity)  # product.buy() updates the product's stock
+        return total_price
