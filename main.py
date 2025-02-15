@@ -26,20 +26,26 @@ _________________________________
 Please choose a number: """
 
 
+def get_valid_int_input(prompt, min_val=None, max_val=None):
+    """
+    Reusable function to get valid integer input within an optional range.
+    """
+    while True:
+        user_input = input(prompt).strip()
+        try:
+            value = int(user_input)
+            if (min_val is None or value >= min_val) and (max_val is None or value <= max_val):
+                return value
+            print(f"Invalid input. Please enter a number between {min_val} and {max_val}.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+
 def get_user_input():
     """
     Prompts the user to select a menu option (1-4) and returns the valid choice as a string.
-    Continues prompting until a valid integer between 1 and 4 is entered.
     """
-    while True:
-        try:
-            user_menu_choice = int(input(show_user_menu()).strip())
-            if 1 <= user_menu_choice <= 4:
-                return str(user_menu_choice)
-            else:
-                print("Invalid input. Please select a menu item between 1 - 4.")
-        except ValueError:
-            print("Invalid input. Please enter a number between 1 - 4.")
+    return str(get_valid_int_input(show_user_menu(), 1, 4))
 
 
 def list_all_products_in_store(store_obj):
@@ -47,14 +53,15 @@ def list_all_products_in_store(store_obj):
     Lists all active products in the store and prints them out to the console.
     """
     products_in_store = store_obj.get_all_products()
-    if not products_in_store:
-        print("No active products in store.")
-        return
-
     print("\n------------- All Products in Store -------------")
     print("_________________________________________________\n")
-    for idx, product in enumerate(products_in_store, start=1):
-        print(f"{idx}. {product.show()}")
+
+    if not products_in_store:
+        print("No active products in store.")
+    else:
+        for idx, product in enumerate(products_in_store, start=1):
+            print(f"{idx}. {product.show()}")
+
     print("_________________________________________________\n")
 
 
@@ -86,28 +93,13 @@ def make_an_order(store_obj):
     for index, product in enumerate(products_in_store, start=1):
         print(f"{index}. {product.name} (Price: ${product.price}, Stock: {product.quantity})")
     print("_______________________________________________________")
-    # Ask the user to select a product index
-    while True:
-        try:
-            choice = int(input("\nEnter product number: ").strip())
-            if 1 <= choice <= len(products_in_store):
-                chosen_product = products_in_store[choice - 1]
-                break
-            else:
-                print(f"Invalid choice. Please enter a number between 1 and {len(products_in_store)}.")
-        except ValueError:
-            print("Invalid input. Please enter a valid product number.")
 
-    # Ask the user for the quantity
-    while True:
-        try:
-            quantity = int(input(f"Enter quantity for {chosen_product.name}: ").strip())
-            if quantity > 0:
-                break
-            else:
-                print("Quantity must be a positive integer.")
-        except ValueError:
-            print("Invalid input. Please enter a valid integer.")
+    # Get valid product selection
+    choice = get_valid_int_input("\nEnter product number: ", 1, len(products_in_store))
+    chosen_product = products_in_store[choice - 1]
+
+    # Get valid quantity
+    quantity = get_valid_int_input(f"Enter quantity for {chosen_product.name}: ", 1)
 
     # Attempt the purchase
     try:
@@ -136,17 +128,17 @@ def main():
 
     print("Welcome to the Best Buy Store!")
 
-    running = True
-    while running:
+    while True:
         user_menu_choice = get_user_input()
 
         if user_menu_choice == "4":
             print("\n________________________________")
             print("\nThank you for visiting! Goodbye.")
             print("________________________________\n")
-            running = False
-        else:
-            action_function = dispatcher.get(user_menu_choice)
+            break
+
+        action_function = dispatcher.get(user_menu_choice)
+        if action_function:
             action_function()
 
 
